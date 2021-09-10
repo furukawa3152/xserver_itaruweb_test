@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>itaru`s productlibrary</title>
+    <meta name="viewport" content="width=device-width, initial-scale-1">
+    <!--  css-->
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+    <!--    javascript_test-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"
+            type="text/javascript"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=desert"></script>
+
+
+</head>
+<body>
+<!--このDIVで囲った部分いっぱいに画像を表示-->
+<div id="library" class="big-bg">
+    <header class="page-header wrapper">
+        <h1><a href="index.html"><img class="logo" src="static/images/logo.png" alt="itapro"></a></h1>
+
+        <nav>
+            <ul class="main-nav">
+                <li><a href="index.html">Top</a></li>
+                <li><a href="code.html">Code</a></li>
+                <li><a href="library.html">Photos</a></li>
+                <li><a href="contact.html">contact</a> </li>
+            </ul>
+
+        </nav>
+
+    </header>
+    <div class="wrapper">
+        <h2 class="page-title">Code</h2>
+    </div>
+</div>
+
+<div class="code-body">
+    <header class="post-info">
+        <h2 class="post-title">我が家のLine_Botを作るぜ</h2>
+        <img class="post-icon" src="static/images/line.png" alt="line_icon" width=55rem>
+        <p class="post-cat">category：<a href="code.html">code</a>：My_Line_bot</p>
+    </header>
+    <h3>プログラム概要</h3>
+    <h4>主な使用ライブラリ：flask,line-bot-sdk,gspread,oauth2client <br>
+        やりたかったこと：我が家のオリジナルLine_botを作りたい。でもってgoogle-spreadsheetで返答を簡単に編集したい。
+    </h4>
+    <p>
+        各方面、無課金にて実装できた（これ大事！）。よく見ている「いまにゅのプログラミング塾」の動画を複数参考にさせてもらってます。
+    </p>
+    <h3>こういうやつ</h3>
+
+    <img src="static/images/itaru_bot.jpg" alt="itaru_bot" width=300rem>
+　　 <!--    横棒のみ使用-->
+    <p class="post-info"></p>
+
+    <h3>作成手順</h3>
+        <nav>
+            <ul class="sub-nav-vert">
+                <li><a href="#gcp">Google Cloud Platform設定</a> </li>
+                <li><a href="#line">LINE Developers設定</a> </li>
+                <li><a href="#bot_python">line-bot-sdkで実装</a> </li>
+                <li><a href="#heroku">herokuへデプロイ</a> </li>
+                <li><a href="#kaizou">ちょっと改造</a> </li>
+            </ul>
+        </nav>
+　　 <!--    横棒のみ使用-->
+    <p class="post-info"></p>
+
+
+    <h3 id="gcp">1：Google Cloud Platform設定</h3>
+    <p>GoogleアカウントでGCPに登録。クレジットカードの登録が必要。今回の用途（driveとsheets_API）は
+        登録すれば制限なく無料にて利用可能のようである（R3.7現在）。<br>
+        プロジェクトを作成し、「APIとサ－ビス」より「Google Drive API」と「Sheets API」を有効化。<br>
+        「APIとサ－ビス」の認証情報より、サービスアカウントを適当な名前で新規作成し、<b class="underline">jsonファイルをダウンロードする。</b><br>
+        スプレッドシートを作成し、「共有」ボタンよりjsonファイル内の「client_email」のアドレスを編集者として共有させる。<br>
+        <b class="underline">※スプレッドシートのURLとSheet名が後々必要になるので控えておく。</b><br>
+        <br>
+
+    </p>
+    <p>↓適当に返してほしい文字列を入れておく</p>
+    <img src="static/images/sp_sheet.jpg" alt="sp_sheet.jpg" width=300rem>
+    <p class="post-info"></p>
+
+    <h3 id="line">2：LINE Developers設定</h3>
+    <p>LINE DevelopersにLineアカウントでサインイン。<br>
+        <a href="https://developers.line.biz/console/channel/new?type=messaging-api">messaging-api</a>
+        のページでプロバイダを新規登録する。<br>
+        ここでは「チャネル基本設定」タブの<b class="underline">「チャネルシークレット」</b>と
+        「Messaging API設定」タブの<b class="underline">「チャネルアクセストークン」</b>を控える。
+    </p>
+
+    <p class="post-info"></p>
+    <h3 id="bot_python">3：line-bot-sdkで実装</h3>
+    <p>いよいよpythonで実装。LINE公式ライブラリの「line-bot-sdk」のpythonのGithubリポジトリより、入力をそのままオウム返し
+        するコードが書いてあるため借用。
+    </p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    #app.py
+    import os　
+    import random
+    import pandas as pd
+    import gspread
+    from flask import Flask, request, abort
+    from linebot import (
+        LineBotApi, WebhookHandler
+    )
+    from linebot.exceptions import (
+        InvalidSignatureError
+    )
+    from linebot.models import (
+        MessageEvent, TextMessage, TextSendMessage,
+    )
+    from datetime import datetime, timedelta
+    from oauth2client.service_account import ServiceAccountCredentials
+
+
+    app = Flask(__name__)
+    #実際は直書きはせず、os.environでherokuの環境変数に入れる。後述。
+    YOUR_CHANNEL_ACCESS_TOKEN="手順2のチャネルトークン"
+    YOUR_CHANNEL_SECRET="手順2のチャネルシークレット"
+
+    line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
+    handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+    @app.route('/')
+    def hello_world():
+        return "hello_world"
+
+    @app.route("/callback", methods=['POST'])
+    def callback():
+        # get X-Line-Signature header value
+        signature = request.headers['X-Line-Signature']
+
+        # get request body as text
+        body = request.get_data(as_text=True)
+        app.logger.info("Request body: " + body)
+
+        # handle webhook body
+        try:
+            handler.handle(body, signature)
+        except InvalidSignatureError:
+            print("Invalid signature. Please check your channel access token/channel secret.")
+            abort(400)
+
+        return 'OK'
+
+　　#ここまでほぼ公式のまま。ここからちょっと変更して、オウム返しでなく、スプレッドシートから返答を引き出す仕様に。
+    @handler.add(MessageEvent, message=TextMessage)
+    def handle_message(event):
+            reply = get_record(event.message.text)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=reply))
+    #GCPの認証して、スプレッドシートの任意のシートを返す関数。
+    def auth():　
+        #手順1で用意したjsonファイルを'secret.json'という名前で同一ディレクトリに。
+        SP_CREDENTIAL_FILE = 'secret.json'
+        # APIを利用する範囲
+        SP_SCOPE = [
+            'https://spreadsheets.google.com/feeds',
+            'https://www.googleapis.com/auth/drive'
+        ]
+        SP_SHEET_KEY = '手順1で用意したスプレッドシートのURLのd/より後から/editの前まで'
+        SP_SHEET = 'シート名'
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(SP_CREDENTIAL_FILE, SP_SCOPE)
+        gc = gspread.authorize(credentials)
+        worksheet = gc.open_by_key(SP_SHEET_KEY).worksheet(SP_SHEET)
+        return worksheet
+
+　　 #auth関数で手に入れたワークシートをデータフレーム化。入力文字列に対応する返しをランダムで出してくれる関数。
+    def get_record(key):
+        worksheet = auth()
+        df = pd.DataFrame(worksheet.get_all_records())
+        reply_df = df[["入力", "返し"]].values
+        reply = []
+        for row in reply_df:
+            if row[0] in key:
+                reply.append(row[1])
+        return (random.choice(reply))
+    </pre>
+        <p class="post-info"></p>
+
+        <h3 id="heroku">4：herokuへデプロイ</h3>
+    <p>無料で使えるPaaSサービス、herokuでデプロイして24時間いつでも返してくれるBotに。上記のapp.pyファイルと同一ディレクトリにsecret.json
+        とあと二つ以下のファイルを作成。<br>
+    ・reqirements.txt</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    Flask
+    line-bot-sdk
+    pandas
+    gspread
+    oauth2client</pre>
+    <p>・Procfile（テキストファイル。拡張子つけない。）</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    web: python app.py</pre>
+    <p>herokuへ登録したのち、ターミナル上でログイン&rarr;空アプリ作成&rarr;指定してpushという流れ。</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    #ログイン
+    $ heroku login #ブラウザが立ち上がりログイン画面へ
+
+    #アプリ作成
+    $ heroku create 作りたいアプリ名
+
+    #アプリをgit指定
+    $ heroku git:remote -a アプリ名
+
+    #アドしてコミット
+    $ git add
+    $ git commit -m "My first commit"
+
+    #push
+    $ git push heroku main
+
+    #環境変数を設定（今回はline_tokenという変数名に）
+    $ heroku config:set line_token=アクセストークンの値  </pre>
+
+    <p>&darr;デプロイ完了したら、LineのMessaging API設定のWebhook設定に"アプリurl/callback"というURLを登録しWenhookの利用をオンにすれば準備完了。</p>
+    <img src="static/images/lineAPI.jpg" alt="lineAPI.jpg" width=300rem>
+    <p>&darr;返事した！最初は結構感動！！</p>
+    <img src="static/images/bot_demo.jpg" alt="bot_demo.jpg" width=300rem>
+
+
+    <p class="post-info"></p>
+
+        <p class="post-info"></p>
+    <h3 id="kaizou">5：ちょっと改造</h3>
+    <p>スプレッドシート読み込みの復習もかねてちょっと改造。同一スプレッドシートに別のシートを作成。
+    </p>
+    <p>&darr;366日分、何の記念日化を登録した「what_day」というシート。調べてみると毎日何かしらの記念日なものだ。</p>
+    <img src="static/images/what_day_sheet.jpg" alt="what_day.jpg" width=300rem>
+
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    def auth2_whatday():
+        #シート名以外、上記のauth()関数と全く同じ
+        return worksheet
+
+    #本日日付の「月」と「日」で読み込んだワークシートを紹介。今日は何の日かを返す。
+    def get_whatday():
+        now = datetime.now() + timedelta(hours=9)
+        month = now.month
+        day = now.day
+        worksheet = auth2_whatday()
+        df = pd.DataFrame(worksheet.get_all_records())
+        reply_df = df[["月", "日", "内容"]].values
+        naiyou = []
+        for row in reply_df:
+            if row[0] == month and row[1] == day:
+                naiyou.append(row[2])
+        return (f"今日{month}月{day}日は、{naiyou[0]}ですよ～。")
+
+    #handler.addを書き換え、「何の日」、「なんの日」という文字列を受け取ったら上の関数を発動。
+    @handler.add(MessageEvent, message=TextMessage)
+    def handle_message(event):
+        if "何の日" in event.message.text or "なんの日" in event.message.text:
+            reply = get_whatday()
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=reply))
+        else:
+            reply = get_record(event.message.text)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=reply))    </pre>
+    <p>&darr;日付を計算して今日は何の日か教えてくれる。</p>
+    <img src="static/images/whatday_demo.jpg" alt="whatday_demo.jpg" width=300rem>
+    <p>他にもおみくじ作ったりいろいろ遊べる。</p>
+    <p class="post-info"></p>
+    <h3>学んだこと</h3>
+    <h4>LINE Messaging APIは、調べた感じreplyは制限なく無料で使える（R3.7月現在）。GCPも無料枠でOK。<br>
+        herokuはクレカ登録なしでも月に550時間までは無料。身内で使う分には全然足りるはず。ただしsleepしてしまうため、
+        時間が空くと一度返信までに30秒ほどかかる。とはいえ十分遊べる。無料枠バンザイ！<br>
+        月額700円程払うとスリープもなくなり常時起動出来るので、ちょっとしたお店のBotとか簡単に作れるな～と。
+        クラウド上のスプレッドシートを簡単にpythonから操作できるのもかなりいろいろ使えそう。
+    </h4>
+
+
+
+</div>
+
+
+</body>
+<footer>
+    <div class="wrapper">
+        <p><small>&copy; 2021 furukawa3152</small></p>
+    </div>
+
+</footer>
+</html>

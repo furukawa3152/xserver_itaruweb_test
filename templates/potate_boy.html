@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>itaru`s productlibrary</title>
+    <meta name="viewport" content="width=device-width, initial-scale-1">
+    <!--  css-->
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+    <!--    javascript_test-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"
+            type="text/javascript"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=desert"></script>
+
+
+</head>
+<body>
+<!--このDIVで囲った部分いっぱいに画像を表示-->
+<div id="library" class="big-bg">
+    <header class="page-header wrapper">
+        <h1><a href="index.html"><img class="logo" src="static/images/logo.png" alt="itapro"></a></h1>
+
+        <nav>
+            <ul class="main-nav">
+                <li><a href="index.html">Top</a></li>
+                <li><a href="code.html">Code</a></li>
+                <li><a href="library.html">Photos</a></li>
+                <li><a href="contact.html">contact</a> </li>
+            </ul>
+
+        </nav>
+
+    </header>
+    <div class="wrapper">
+        <h2 class="page-title">Code</h2>
+    </div>
+</div>
+
+<div class="code-body">
+    <header class="post-info">
+        <h2 class="post-title">ポテト坊やを探すWebアプリ</h2>
+        <img class="post-icon" src="static/images/potate_boy.jpg" alt="potate_boy" width=55rem>
+        <p class="post-cat">category：<a href="code.html">code</a>：potate_boy_app</p>
+    </header>
+    <h3>プログラム概要</h3>
+    <h4>主な使用ライブラリ：opencv,streamlit<br>
+        やりたかったこと：ポテトチップスの袋を見分ける画像認識モデル作成の下準備のために、左上のキャラクターの位置を返す
+        プログラムを書きたい。<br>(→<a href="http://labs.eecs.tottori-u.ac.jp/sd/Member/oyamada/OpenCV/html/py_tutorials/py_imgproc/py_template_matching/py_template_matching.html">
+        open-cvのmatchTemplate</a>を利用して実装。)
+    </h4>
+    <p>
+        機械学習のハッカソンに参加して、何やら一人趣旨をはき違えて作成してしまったアプリです。写真を入れるとポテト坊やを探して赤い四角で囲んでくれます。
+        カルビーの担当者さんに一応見てもらったので、ほんのちょっとだけ公式と言えるかも（笑）。<br>
+        <a class="app_button" href="https://share.streamlit.io/furukawa3152/streamlit_deptest/potate_test.py">
+        アプリを開く</a>※スマホで縦画面で使う前提で作っています。<br>
+    </p>
+    <h3>GETだぜ！！</h3>
+
+    <img src="static/images/app_demo.jpg" alt="app_demo" width=300rem>
+　　 <!--    横棒のみ使用-->
+    <p class="post-info"></p>
+
+    <h3>作成工程</h3>
+    <p>まずはテスト。こういう二つの画像を用意してcv2.matchTemplateで処理する。</p>
+    <div class="body-withimage">
+        <img class="withimage-img" src="static/images/potate_boy.jpg" alt="potate_boy">
+        <p class="withimage-text">
+        ←potate_boy.jpg
+        </p>
+    </div>
+    <div class="body-withimage">
+        <img class="withimage-img" src="static/images/potato_boy_face.jpg" alt="potate_boy_face">
+        <p class="withimage-text">
+        ←potate_boy_face.jpg
+        </p>
+    </div>
+
+
+
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    import cv2
+
+    image = cv2.imread("potate_boy.jpg")
+    template = cv2.imread("potate_boy_face.jpg")
+    (hight, width, color) = template.shape
+    result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+    cv2.rectangle(image, max_loc, (max_loc[0] + width, max_loc[1] + hight), 255, 2)
+    cv2.imshow("test", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()        </pre>
+    <div class="body-withimage">
+    <img class="withimage-img" src="static/images/potate_result.jpg" alt="potate_result">
+    <p class="withimage-text">
+    ←こういう画像を返してくれます。一致する場所にrectangleを描いた状態です。
+    </p>
+    </div>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)</pre>
+    <p>の部分で画像全体の一致度を配列として返してくれており、</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)</pre>
+    <p>を出すことで最も高い一致度（max_val）を示す座標(min_loc, max_loc)を返す。<br>
+    と、ここまで出来たら後は楽勝かと思ったらそうでもなかった・・・
+    </p>
+    <p class="post-info"></p>
+    <h3>課題1：サイズの不一致に弱い</h3>
+    <p>templateのサイズが変わると、途端に一致度が極端に下がるのである。このままでは実用性はかなり低い。</p>
+    <p>→対策：templateのサイズを縮小→拡大していき、最も一致度の高い拡大率で判定する。</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    import numpy as np
+    import cv2
+　　 def macth_image(image, template):  # マッチした位置、スケール、一致度を返す
+        height = template.shape[0]
+        width = template.shape[1]
+        g_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # グレースケール加工
+        scale = [0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.15,
+                 1.2, 1.25,
+                 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 2, 2.3, 2.6, 2.8, 3, 3.2, 3.5]
+        rank = []#一致度のみを格納するlist
+        for i in scale:  # scaleのパターンだけ縮小→拡大し、最もマッチする値を選ぶ
+            g_template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+            g_template = cv2.resize(g_template, (int(width * i), int(height * i)))  # 縮小拡大
+            result = cv2.matchTemplate(g_image, g_template, cv2.TM_CCOEFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            rank.append(max_val)
+
+        best_scale = scale[np.argmax(rank)]
+        g_template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+        g_template = cv2.resize(g_template, (int(width * best_scale), int(height * best_scale)))  # 縮小拡大
+        result = cv2.matchTemplate(g_image, g_template, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        return (min_val, max_val, min_loc, max_loc, g_template, best_scale)
+    </pre>
+    <p>scaleの幅は何となく設定。増やしすぎると時間がかかるため、この辺が実用的というところにおさまった。
+        また、こういう画像処理はグレースケールで行う方がよいと聞いたのでついでに実装。</p>
+
+        <p class="post-info"></p>
+    <h3>Webアプリ化していくぜ！</h3>
+    <p>簡単にWebアプリとしてデプロイ出来るstramlitは素敵すぎる。Webに公開するには
+        <a href="https://streamlit.io/sharing">こちら</a>から事前に申請が必要（2021/6/26現在）。<br>
+        公開したいGitHubのリポジトリを登録して申請すると、2，3日で招待完了のメールが来る。
+    </p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    import streamlit as st
+    import numpy as np
+    from PIL import Image
+    import cv2
+
+    if __name__ == '__main__':
+        #ここからアプリ本体。streamlit固有の記法だが簡単。マークアップも利用可能。
+        st.title("ポテト坊やを探すぜ！")
+        """
+        **~Let`s Get POTATE-BOY!!!~**
+        """
+        jaga = Image.open("jagaimoyarou.jpg")　#アプリのトップ用画像。
+        jaga = np.array(jaga.convert("RGB"))　#色が反転して表示されたため加工。
+        jaga = cv2.cvtColor(jaga, 1)
+        st.image(jaga, use_column_width=False)　#use_column_width=Falseは表示した画像の拡大表示用矢印を出すか出さないかだったと思う。
+        uploaded_file = st.file_uploader("ここから画像を入れてね", type=["png", "jpg", "jpeg"])
+
+        if uploaded_file is not None:　#画像が読み込まれたら処理を開始
+            image = Image.open(uploaded_file)
+            image = np.array(image.convert("RGB"))　#opencvで処理するために配列に変換。
+            image = cv2.cvtColor(image, 1)
+            #※1：後でここにコードを挿入します
+            tmp = Image.open("potato_boy_face.jpg")　#テンプレート画像
+            image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)　#iphoneで縦撮影した場合は90度回転が必要。
+            #※2：後でここにコードを挿入します
+
+        result = macth_image(image, tmp)　#上の関数を利用し、最も一致度が高いものの情報と画像を取得
+            w, h = result[4].shape[1::-1]
+            top_left = (result[3][0] - w, result[3][1] - h)
+            btm_right = (top_left[0] + int(w * 2.5), top_left[1] + h * 3)
+            cv2.rectangle(image, top_left, btm_right, 255, 2)
+            if result[1] >= 0.45:　#一致度に応じて表示するメッセージを変更
+                text = "GET!!!"
+            elif result[1] >= 0.3:
+                text = "maybe.."
+            else:
+                text = "Hmm.."
+        　　 #結果の画像にメッセージを書き込む
+            cv2.putText(image, text, (top_left[0], top_left[1]), cv2.FONT_HERSHEY_PLAIN,
+                        4, (255, 0, 0), 5, cv2.LINE_AA)
+            st.image(image, caption=f"一致度：{result[1]},縮尺：{result[5]},傾き：{np.argmax(max_list)}", use_column_width=True)</pre>
+    <p>とりあえずアプリっぽくは仕上がった。処理にかなり時間がかかるのがストレス。<br>
+        デプロイする際には、requirements.txtにライブラリの一覧（pip freezeで取得した）を書くことと、今回はcv2を使うため、packages.txtも必要だった。
+    </p>
+     <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+       #packages.txt
+       freeglut3-dev
+       libgtk2.0-dev</pre>
+    <p class="post-info"></p>
+    <h3>処理速度を上げたい</h3>
+    <p>iPhoneで撮影した写真はそれなりにでかいため、読み込んだ画像をリサイズしてから処理させるよう変更</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+       if uploaded_file is not None:#画像が読み込まれたら処理を開始
+        image = Image.open(uploaded_file)
+        image = np.array(image.convert("RGB"))#opencvで処理するために配列に変換。
+        image = cv2.cvtColor(image, 1)
+        if image.shape[0] > 960:  # 大きい画像（height>960）は小さくして検証
+            image = cv2.resize(image, (960, 720))    </pre>
+    <p>※1の位置から２行を追加した。結構早くなったが、ここで次の問題が、、、</p>
+        <p class="post-info"></p>
+    <h3>課題2：傾いた画像に弱い</h3>
+    <p>位置を取得できるようになったが、あくまで真正面から取った時のみ。傾いた画像には反応してくれない
+    <br>→対策：少しずつ（今回は-９度～＋９度までを３度毎に）傾かせて、一致度の高いところで処理する。</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    result_list = []
+    max_list = []
+    for i in range(-3, 4):  # 傾き実装
+        tmp_arg = tmp.rotate(i * 3)
+        tmp_arg = np.array(tmp_arg.convert("RGB"))
+        tmp_arg = cv2.cvtColor(tmp_arg, 1)
+        arg_result = macth_image(image, tmp_arg)
+        result_list.append(arg_result)
+        max_list.append(arg_result[1])
+
+    result = result_list[np.argmax(max_list)]</pre>
+    <p>※2の部分に上記を追記<br>
+    単純に傾かせた数だけ分処理時間が乗算で増えていく。360度回転にした日には解析までに3分近くかかった。
+    ある程度まっすぐ撮影してもらえるだろうと、実用性重視で最低限の傾きにとどめた。これにて実装完了。
+    </p>
+        <p class="post-info"></p>
+    <h3>学んだこと</h3>
+    <h4>opencv(cv2)とpillow(PIL)でカバー領域が異なるので使い分けが大切だなと思った。<br>
+    streamlitで読み込んだ画像はPILイメージ（＝画像データ）で、cv2のmatchTemplateを利用するためには配列に変換する必要がある。
+    しかしながら、少しずつ角度をつけていくという処理はPILでの方が圧倒的に行いやすいためPILイメージで行う方がよい。という具合に。<br>
+    まあそれにしても、簡単に画像の一致を返してくれるcv2も、簡単にWebにデプロイさせてくれるstreamlitもめちゃくちゃ便利でありがたいライブラリである。
+    </h4>
+
+
+
+
+
+
+</div>
+
+
+</body>
+<footer>
+    <div class="wrapper">
+        <p><small>&copy; 2021 furukawa3152</small></p>
+    </div>
+
+</footer>
+</html>

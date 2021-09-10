@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>itaru`s product python_tips</title>
+    <meta name="viewport" content="width=device-width, initial-scale-1">
+    <!--  css-->
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+    <!--    javascript_test-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"
+            type="text/javascript"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=desert"></script>
+
+
+</head>
+<body>
+<!--このDIVで囲った部分いっぱいに画像を表示-->
+<div id="library" class="big-bg">
+    <header class="page-header wrapper">
+        <h1><a href="index.html"><img class="logo" src="static/images/logo.png" alt="itapro"></a></h1>
+
+        <nav>
+            <ul class="main-nav">
+                <li><a href="index.html">Top</a></li>
+                <li><a href="code.html">Code</a></li>
+                <li><a href="library.html">Photos</a></li>
+                <li><a href="contact.html">contact</a> </li>
+            </ul>
+
+        </nav>
+
+    </header>
+    <div class="wrapper">
+        <h2 class="page-title">Code</h2>
+    </div>
+</div>
+
+<div class="code-body">
+    <header class="post-info">
+        <h2 class="post-title">python_tips</h2>
+        <img class="post-icon" src="static/images/code_icon.png" alt="code-icon" width=55rem>
+        <p class="post-cat">category：<a href="code.html">code</a>：python_tips</p>
+    </header>
+    <h3>後で自分がコピペする用のいろいろ</h3>
+    <h4>1：excelファイルを行ごとに読み込む<br>
+        主な仕様ライブラリ：pandas(xlrdとopenpyxlもインストール)<br>
+        やりたかったこと：エクセルファイルの表を行ごとに取り出して利用。
+    </h4>
+    <nav>
+        <ul class="sub-nav">
+            <li><a href="#df">データフレーム編</a> </li>
+            <li><a href="#dict">　dict編</a> </li>
+        </ul>
+
+    </nav>
+
+
+
+    <table  border=1 style="border-collapse: collapse; border-color:#b5b5b5; ">
+        <caption class="excel_demo_title">登録テスト.xlsx</caption>
+        <tr>
+            <th>ID</th>
+            <th>登録日</th>
+        </tr>
+        <tr>
+            <td class="excel_demo">10</td>
+            <td class="excel_demo">2021/6/1</td>
+        </tr>
+        <tr>
+            <td class="excel_demo">15</td>
+            <td class="excel_demo">2021/7/1</td>
+        </tr>
+
+    </table>
+    <p id="df">◇データフレームとして格納編</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    data_file = pd.read_excel("登録テスト.xlsx")
+    arg_df = data_file[["ID", "登録日"]].values
+    for row in arg_df:
+        print(row[0],row[1])
+        #10 2021-06-01 00:00:00
+        #15 2021-07-01 00:00:00     </pre>
+    <p>forの下にpyautoguiのコードが来て、システムへの自動入力など。</p><br>
+    <p>◇職場の会計ソフトの日付入力形式が、令和3年6月1日＝"5030601"なので変換</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    import pandas as pd
+    data_file = pd.read_excel("登録テスト.xlsx")
+    arg_df = data_file[["ID", "登録日"]].values
+    for row in arg_df:
+        ID = str(int(row[0]))
+        ymd = row[1]
+        alt_y = "5" + str("{0:02d}".format(ymd.year - 2018))
+        alt_m = str("{0:02d}".format(ymd.month))
+        alt_d = str("{0:02d}".format(ymd.day))
+        alt_ymd = alt_y + alt_m + alt_d
+        print(ID, alt_ymd)
+        if ID == "":
+            break　#空白セルが生きているときがあるので一応処理
+        #10 5030601
+        #15 5030701</pre>
+    <p>ニッチすぎるが私には汎用性のあるコードなので（笑）</p><br>
+    <p id="dict">◇dictとして格納したいとき編</p>
+    <pre class="code-line prettyprint linenums" style="overflow:auto; overflow-y:hidden;">
+    import pandas as pd
+    hoge_data = pd.read_excel("登録テスト.xlsx")
+    hoge_df = hoge_data[["ID", "登録日"]].values
+    hoge_dic = {}
+    for drug in hoge_df:
+        key = drug[0]
+        value = drug[1]
+        hoge_dic[key] = value
+    print(hoge_dic)
+    #{10: Timestamp('2021-06-01 00:00:00'), 15: Timestamp('2021-07-01 00:00:00')}</pre>
+    <p>これらを組み合わせると結構いろいろ出来る</p>
+
+</div>
+
+
+</body>
+<footer>
+    <div class="wrapper">
+        <p><small>&copy; 2021 furukawa3152</small></p>
+    </div>
+
+</footer>
+</html>
