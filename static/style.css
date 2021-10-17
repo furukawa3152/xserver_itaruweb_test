@@ -533,3 +533,9 @@ margin-top: 3px;
     background-image: linear-gradient(transparent 60%,#ffff00 40%);
     padding-bottom: .15rem;
 }
+
+/*chatbot*/
+.bot_talks{
+    color: black;
+    padding-left: 40px;
+}

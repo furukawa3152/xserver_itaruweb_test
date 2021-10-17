@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>itaru`s productlibrary</title>
+    <title>チャットボットのテストページです</title>
     <meta name="viewport" content="width=device-width, initial-scale-1">
     <!--  css-->
     <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
@@ -16,13 +16,11 @@
             type="text/javascript"></script>
     <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=desert"></script>
     <script src="https://sdk.form.run/js/v2/formrun.js"></script>
-
 </head>
 <body>
-<!--このDIVで囲った部分いっぱいに画像を表示-->
 <div id="library" class="big-bg">
     <header class="page-header wrapper">
-        <h1><a href="index.html"><img class="logo" src="static/images/logo.png"  alt="itapro"></a></h1>
+        <h1><a href="index.html"><img class="logo" src="static/images/logo.png" alt="itapro"></a></h1>
 
         <nav>
             <ul class="main-nav">
@@ -31,31 +29,43 @@
                 <li><a href="library.html">Photos</a></li>
                 <li><a href="contact.html">contact</a> </li>
             </ul>
-
         </nav>
 
     </header>
     <div class="wrapper">
-        <h2 class="page-title">Contact</h2>
+        <h2 class="page-title">chatbot</h2>
     </div>
 </div>
 
     <div class="code-body">
         <header class="post-info">
-            <h2 class="post-title">{{name}}様ありがとうございました</h2>
+            <h2 class="post-title">botテスト</h2>
             <img class="post-icon" src="static/images/contact_icon.png" alt="film_icon" width=70rem>
-            <p class="post-cat">５秒後にTopページへ移動します。</p>
+            <p class="post-cat">category：chatbot</p>
         </header>
-
+        <h3 class="contact_body">bot作成中</h3>
     </div>
+        <!-- class, action, methodを変更しないでください -->
+    <form class="formrun" action="/talkroom.html" method="post">
+      <!-- ↓自由に要素を追加・編集することができます -->
+      <div class="form_item">
+        <label>なんか入力してね</label><br>
+        <input class="input" name="talk" type="text" data-formrun-required>
+      </div>
 
-
-　　<script src="static/redirect.js"></script>
+      <!-- ボット投稿をブロックするためのタグ -->
+      <div class="_formrun_gotcha">
+        <style media="screen">._formrun_gotcha {position:absolute!important;height:1px;width:1px;overflow:hidden;}</style>
+        <label for="_formrun_gotcha">If you are a human, ignore this field</label>
+        <input type="text" name="_formrun_gotcha" id="_formrun_gotcha" tabindex="-1">
+      </div>
+      <button class="send_icon" type="submit" data-formrun-submitting-text="送信中...">
+          送信</button>
+    </form>
 </body>
 <footer>
     <div class="wrapper">
         <p><small>&copy; 2021 furukawa3152</small></p>
     </div>
-
 </footer>
 </html>
