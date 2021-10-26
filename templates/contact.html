@@ -31,6 +31,7 @@
                 <li><a href="library.html">Photos</a></li>
                 <li><a href="contact.html">contact</a> </li>
             </ul>
+
         </nav>
 
     </header>
@@ -44,26 +45,27 @@
             <h2 class="post-title">お問い合わせ</h2>
             <img class="post-icon" src="static/images/contact_icon.png" alt="film_icon" width=70rem>
             <p class="post-cat">category：contact</p>
+
         </header>
         <h3 class="contact_body">サイトをご覧いただきありがとうございます。<br>pythonコードへのご意見、写真へのご感想など、なんでもお気軽にお聞かせください。</h3>
     </div>
         <!-- class, action, methodを変更しないでください -->
-    <form class="formrun" action="/thanx.html" method="post">
+    <form class="formrun" action="send_mail.html" method="post">
       <!-- ↓自由に要素を追加・編集することができます -->
       <div class="form_item">
         <label>お名前 [必須]</label><br>
-        <input class="input" name="お名前" type="text" data-formrun-required>
-        <div data-formrun-show-if-error="お名前">お名前は必ず入力してください</div>
+        <input class="input" name="cl_name" type="text" data-formrun-required>
+        <div data-formrun-show-if-error="cl_name">お名前は必ず入力してください</div>
       </div>
       <div>
         <label>メールアドレス [必須]</label><br>
-        <input class="input" name="メールアドレス" type="text" data-formrun-type="email" data-formrun-required>
-        <div data-formrun-show-if-error="メールアドレス">メールアドレスを正しく入力してください</div>
+        <input class="input" name="cl_add" type="text" data-formrun-type="email" data-formrun-required>
+        <div data-formrun-show-if-error="cl_add">メールアドレスを正しく入力してください</div>
       </div>
       <div>
         <label>ご意見、ご感想など [必須]</label><br>
-        <textarea class="input input_body" name="お問い合わせ" data-formrun-required></textarea>
-        <div data-formrun-show-if-error="お問い合わせ">内容を入力してください</div>
+        <textarea class="input input_body" name="cl_ask" data-formrun-required></textarea>
+        <div data-formrun-show-if-error="cl_ask">内容を入力してください</div>
       </div>
 
       <!-- ボット投稿をブロックするためのタグ -->
@@ -80,5 +82,6 @@
     <div class="wrapper">
         <p><small>&copy; 2021 furukawa3152</small></p>
     </div>
+
 </footer>
 </html>
