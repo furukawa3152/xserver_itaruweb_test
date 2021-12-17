@@ -551,3 +551,42 @@ margin-top: 3px;
 .mail_kakunin{
     margin-left: 8rem;
 }
+
+.pRPA_tytle{
+    font-size: 22px;
+}
+.pRPA_motiv{
+    padding-top: 6px;
+    font-size: 16px;
+}
+
+.pRPA_menu {
+    padding: 0px;
+    margin: 20px 0 20px 0;
+    list-style: none;
+}
+
+.pRPA_menu > li {
+    position: relative;
+    padding: 0px 0px 0px 1em;
+}
+.pRPA_menu > li::before {
+    position: absolute;
+    top: 50%;
+    left: 0px;
+    transform: translateY(-50%);
+    width: 0px;
+    height: 0px;
+    border: 0.3em solid transparent;
+    border-left: 0.4em solid #eda81c;
+    content: "";
+}
+.pRPA_menu a{
+    color:#383736;
+}
+.gmail_code{
+    margin-top:3px;
+}
+.rpaimg{
+    border: 1px solid #c0c0c0;
+}

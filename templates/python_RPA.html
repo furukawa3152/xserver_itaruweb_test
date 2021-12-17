@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>itaru`s product python_RPA</title>
+    <meta name="viewport" content="width=device-width, initial-scale-1">
+    <!--  OGP-->
+    <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# website: http://ogp.me/ns/website#">
+        <meta property="og:url" content="https://itaruweb.com/">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="itaru's product">
+        <meta property="og:description" content="pythonでの業務自動化を紹介。pythonロボで自動メール送信するよ！！！">
+        <meta property="og:site_name" content=" itaru's product">
+        <meta property="og:image" content="https://itaruweb.com/static/images/kaeru_ogp.jpg">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@itaru_gt">
+        <meta name="twitter:image" content="https://itaruweb.com/static/images/kaeru_ogp.jpg">
+        <!--  css-->
+        <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet">
+        <link href="static/style.css" rel="stylesheet">
+        <!--    javascript_test-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"
+                type="text/javascript"></script>
+        <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=desert"></script>
+
+
+    </head>
+<body>
+<!--このDIVで囲った部分いっぱいに画像を表示-->
+<div id="library" class="big-bg">
+    <header class="page-header wrapper">
+        <h1><a href="top"><img class="logo" src="static/images/logo.png" alt="itapro"></a></h1>
+        <nav>
+            <ul class="main-nav">
+                <li><a href="top">Top</a></li>
+                <li><a href="code">Code</a></li>
+                <li><a href="library">Photos</a></li>
+                <li><a href="contact">contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="wrapper">
+        <h2 class="page-title">Code</h2>
+    </div>
+</div>
+
+<div class="code-body">
+    <header class="post-info">
+        <h2 class="post-title">pythonでRPA作ってみた</h2>
+        <img class="post-icon" src="static/images/code_icon.png" alt="code-icon" width=55rem>
+        <p class="post-cat">category：<a href="code">code</a>：python_RPA</p>
+    </header>
+    <h1 class="pRPA_tytle">pythonロボで自動メール送信するよ！！！</h1>
+    <p>※本記事は「RPA Community Advent Calendar 2021」24日目の記事として書かせていただいております。
+        <br>
+        最近pythonの勉強を初めて、少しずつ業務自動化に活用をすすめているものです。<br>
+        uipathでRPAやりたいが、職場ではライセンスの問題があるな。。。というわけで無償で出来るPythonで挑んでいたら
+        結構いろんなことが出来て楽しくなってきているところです。
+        最近作ったものの中で、実用性に手ごたえのあったものを紹介させていただきます。
+    </p>
+        <br>
+    <h3>プログラム概要</h3>
+    <h4>主な使用ライブラリ：smtplib,pyautogui他<br>
+        やりたかったこと：特定の条件を満たすと自動的にメールを送る仕組みを実装したい。
+    </h4>
+    <p>
+        gmail送信をPythonで実装出来たので、これを利用した業務自動化が出来ないかと模索してみたものです。
+        職場のメッセンジャーアプリ受信の検知や、ロボのエラーログ検出などでメール送信させる仕組みを作ってみました。
+    </p>
+    <nav>
+        <ul class="pRPA_menu">
+            <p>目次</p>
+            <li><a href="#gmail">まずはgmail送信を実装</a></li>
+            <li><a href="#patrol">活用1：常時画面を見張って、特定の画像を検出したらメール送信</a></li>
+            <li><a href="#logarart">活用2：毎日特定の時刻に起動してエラーログがあればメール送信</a></li>
+            <li><a href="#ping">活用3：pingを飛ばして死活確認。落ちている端末をメール通知</a></li>
+            <li><a href="#pyinstaller">パッケージ化してタスクスケジューラで自動起動</a></li>
+        </ul>
+    </nav>
+    <h3 id="gmail">まずはgmail送信を実装</h3>
+    <p>googleのアプリパスワードを取得してconfig.csvを作成。</p>
+    <table border=1 style="border-collapse: collapse; border-color:#b5b5b5; ">
+        <caption class="excel_demo_title">config.csv</caption>
+        <tr>
+            <th>key</th>
+            <th>value</th>
+        </tr>
+        <tr>
+            <td class="excel_demo">ID</td>
+            <td class="excel_demo">googleアカウント名</td>
+        </tr>
+        <tr>
+            <td class="excel_demo">pass</td>
+            <td class="excel_demo">アプリパスワード</td>
+        </tr>
+        <tr>
+            <td class="excel_demo">send_to</td>
+            <td class="excel_demo">送信先アドレス</td>
+        </tr>
+    </table>
+    <p>pythonでのGmail送信コード</p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+    def gmail_send():
+        import pandas as pd
+        import smtplib
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+        from email.mime.application import MIMEApplication
+        import os
+        data_file = pd.read_csv("config.csv")
+        arg_df = data_file[["key", "value"]].values
+        id, password, send_to = (arg_df[0][1], arg_df[1][1], arg_df[2][1])
+        g_mail_address = f"{id}@gmail.com"
+        g_mail_password = password
+        stmp_server = "smtp.gmail.com"
+        stmp_port = "587"
+        subject = "件名"
+        body = "メール本文"
+        msg = MIMEMultipart()
+        msg["Subject"] = subject
+        msg["To"] = send_to
+        msg["From"] = g_mail_address
+        msg.attach(MIMEText(body, "html"))
+        #添付ファイル(テキストに変換して添付されるらしい）
+        filepath = "fileﾊﾟｽ/hoge.png"
+        filename = os.path.basename(filepath)
+        with open(filepath, "rb") as f:
+            mb = MIMEApplication(f.read())
+        mb.add_header("Content-Disposition", "attachment", filename=filename)
+        msg.attach(mb)
+        s = smtplib.SMTP(stmp_server, stmp_port)
+        s.starttls()
+        s.login(g_mail_address,g_mail_password)
+        s.sendmail(g_mail_address, send_to, msg.as_string())
+        s.quit()</pre>
+    <p>pythonファイルの直下に置いたconfig.csvからアカウント情報を呼び出してメール送信。</p>
+    <br>
+    <h3 id="patrol">活用1：常時画面を見張って、特定の画像を検出したらメール送信</h3>
+    <p>メール送信が出来たので、これで何が出来たら嬉しいかな～といろいろ考えてみた。
+    <br>常時起動しておいて、特定の画像を検出したら知らせるパトロールアプリを作ってみる。
+    <br>今回は社内用PCでメッセンジャーアプリの受信を検知したら通知を送信。
+    </p>
+    <img src="static/images/message.png" alt="message_demo" width=80%>
+    <p>↑こういうメッセージを、離席時や休みの日に送られてもかなり放置になってしまったりするので、</p>
+    <img class="rpaimg" src="static/images/message_kenti.png" alt="message_kenti" width=50%>
+    <p>↑ロボに見張らせて、こんな感じでスクショをつけて通知してもらおう！</p>
+    <br>
+    <p>target.png(メッセンジャーのダイアログの左上部分切り抜き）</p>
+    <img src="static/images/recieve.png" alt="target" width=100px>
+    <p>whileループで、常にこの画像が出ていないかを検証し続ける。
+    <br>pyautoguiのlocateCenterOnScreenで画面上に一致画像があるか検証してくれる。
+    </p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+     import pyautogui as pg
+     while True:
+        print("stand by")
+        if pg.locateCenterOnScreen("target.png"):
+            print("検出したよ～～～！！！")
+            break</pre>
+    <p>これだけで見張りプログラムは完成。後は「検出したよ～」の部分を上記のメール送信に変更すればOK</p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+     import pyautogui as pg
+     from time import sleep
+     while True:
+        print("stand by")
+        if pg.locateCenterOnScreen("target.png"):
+            pg.screenshot("fileﾊﾟｽ/hoge.png")#スクリーンショット作成
+            sleep(1)
+            gmail_send()#上述の送信プログラム。
+            break</pre>
+    <P>ただし、このままでは検出時無限にGmailを送り続けるウイルスと化してしまうため修正
+    <br>今回はtarget.pngの位置へ移動して右へ190pxの位置にある最小化ボタンを押すことで終了。
+    <br>このあたりはさせたい動作によって細かい微調整が必要。</P>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+　#ipmsg_patroller.py全文
+    import pyautogui as pg
+    from time import sleep
+    import pandas as pd
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.application import MIMEApplication
+    import os
+
+    def ipmsg_receive_loop():
+        while True:
+            print("stand by")
+            if pg.locateCenterOnScreen("target.png"):
+                pg.screenshot("/hoge.png")#スクリーンショット作成
+                sleep(1)
+                pg.moveTo(pg.locateCenterOnScreen("target.png"))
+                pg.move(190, 0)
+                pg.click()#ダイアログの最小化ボタンを押す。
+                gmail_send()#送信。
+                break
+
+    def gmail_send():
+        data_file = pd.read_csv("config.csv")
+        arg_df = data_file[["key", "value"]].values
+        id, password, send_to = (arg_df[0][1], arg_df[1][1], arg_df[2][1])
+        g_mail_address = f"{id}@gmail.com"
+        g_mail_password = password
+        stmp_server = "smtp.gmail.com"
+        stmp_port = "587"
+        subject = "ipmsg検知通知です。"
+        body = "&lt;p&gt;IPメッセンジャー受信を検知しました。スクリーンショットを添付します。&lt;/p&gt;"
+        msg = MIMEMultipart()
+        msg["Subject"] = subject
+        msg["To"] = send_to
+        msg["From"] = g_mail_address
+        msg.attach(MIMEText(body, "html"))
+        #添付ファイル
+        filepath = "/hoge.png"
+        filename = os.path.basename(filepath)
+        with open(filepath, "rb") as f:
+            mb = MIMEApplication(f.read())
+        mb.add_header("Content-Disposition", "attachment", filename=filename)
+        msg.attach(mb)
+        s = smtplib.SMTP(stmp_server, stmp_port)
+        s.starttls()
+        s.login(g_mail_address,g_mail_password)
+        s.sendmail(g_mail_address, send_to, msg.as_string())
+        s.quit()
+        print("reported")
+
+    if __name__ == '__main__':
+        print("見張りを開始します。")
+        while True:
+            ipmsg_receive_loop()</pre>
+    <p>pyinstallerでexe化して必要時に起動しています。(後述)</p>
+    <img src="static/images/patrol_demo.png" alt="patoroller" width=280px>
+    <p>起動するとずっとこの状態で回り続ける。targetの画像が小さいほどループは早く回る。大きい画像だと１ループに数秒かかるため極力小さくしたいところ。
+    </p>
+    <br>
+    <h3 id="logarart">活用2：毎日特定の時刻に起動してエラーログがあればメール送信</h3>
+    <p>毎朝専用の端末で起動させているPythonロボのエラーログフォルダを定時監視して、フォルダが空で無ければ知らせる。</p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+     import glob
+　　　files = glob.glob("errorlogs/*")</pre>
+    <p>単純にこれだけで直下のフォルダのファイル名を取得できるので、後は空かどうかで分岐。</p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+　#errorlog_checker.py全文
+    import glob
+    import os
+    import pandas as pd
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    def filecheck():
+        files = glob.glob("errorlogs/*")
+        if len(files) == 0:
+            #空だったら終了
+            pass
+        else:
+            #ファイル名を改行区切りで取得
+            errors = ""
+            for file in files:
+                errors = errors + os.path.basename(file) + "&lt;br&gt;"
+            gmail_send(errors)#メール送信
+
+    def gmail_send(body_text):
+        data_file = pd.read_csv("config.csv")
+        arg_df = data_file[["key", "value"]].values
+        id, password, send_to = (arg_df[0][1], arg_df[1][1], arg_df[2][1])
+        g_mail_address = f"{id}@gmail.com"
+        g_mail_password = password
+        stmp_server = "smtp.gmail.com"
+        stmp_port = "587"
+        subject = "ロボがやらかした通知です"
+        body = f"&lt;p&gt;下記のエラーを検出しました。&lt;br&gt;{body_text}&lt;/p&gt;"
+        msg = MIMEMultipart()
+        msg["Subject"] = subject
+        msg["To"] = send_to
+        msg["From"] = g_mail_address
+        msg.attach(MIMEText(body, "html"))
+        s = smtplib.SMTP(stmp_server, stmp_port)
+        s.starttls()
+        s.login(g_mail_address, g_mail_password)
+        s.sendmail(g_mail_address, send_to, msg.as_string())
+        s.quit()
+        print("reported")
+
+    if __name__ == '__main__':
+        filecheck()</pre>
+    <p>かなり使いまわしが効きそう。あとはタスクスケジューラ様へおまかせ。</p>
+    <img class="rpaimg" src="static/images/errorcheck.png" alt="errorcheck" width=50%>
+    <br><br>
+    <h3 id="ping">活用3：pingを飛ばして死活確認。落ちていたらメール通知</h3>
+    <p>いや待てよ、そもそもロボの端末落ちてたらどうすんのよ。というわけでpingロボ作成。</p>
+    <p>subprocessモジュールでサクッと行けそう。</p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+    import subprocess
+    ping = subprocess.run(["ping", "-w", "1", "-n", "1", ipｱﾄﾞﾚｽ　], stdout=subprocess.PIPE)
+    print(ping.returncode)　#ping通れば「0」を。ダメなら「1」を返す</pre>
+    <p>これで死活確認出来るので、後はメールと組み合わせ。確認しながら設置したいのでテストモードも作ってみた。</p>
+    <table border=1 style="border-collapse: collapse; border-color:#b5b5b5; ">
+        <caption class="excel_demo_title">config.csv</caption>
+        <tr>
+            <th>key</th>
+            <th>value</th>
+        </tr>
+        <tr>
+            <td class="excel_demo">ID</td>
+            <td class="excel_demo">googleアカウント名</td>
+        </tr>
+        <tr>
+            <td class="excel_demo">pass</td>
+            <td class="excel_demo">アプリパスワード</td>
+        </tr>
+        <tr>
+            <td class="excel_demo">send_to</td>
+            <td class="excel_demo">送信先アドレス</td>
+        </tr>
+                <tr>
+            <td class="excel_demo">testmode</td>
+            <td class="excel_demo">1（1ならテストモード）</td>
+        </tr>
+        <tr>
+            <td class="excel_demo">target_host</td>
+            <td class="excel_demo">目当てのIPアドレス</td>
+        </tr>
+    </table>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+  #ping_robo.py全文
+    import subprocess
+    import pandas as pd
+    import PySimpleGUI as sg
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    # macでは-nを-cに変更
+    def ping_windows(host, testmode):
+        ping = subprocess.run(["ping", "-w", "1", "-n", "1", host], stdout=subprocess.PIPE)
+        if ping.returncode == 0:
+            if testmode == "1":
+                #ダイアログ表示
+                sg.popup(f"{host}OK!!", title="test")
+            else:
+                pass
+        else:
+            if testmode == "1":
+                #ダイアログ表示
+                sg.popup(f"{host}NO!!", title="test")
+            else:
+                #メール送信
+                data_file = pd.read_csv("config.csv")
+                arg_df = data_file[["key", "value"]].values
+                id, password, send_to = (arg_df[0][1], arg_df[1][1], arg_df[2][1])
+                g_mail_address = f"{id}@gmail.com"
+                g_mail_password = password
+                stmp_server = "smtp.gmail.com"
+                stmp_port = "587"
+                subject = "pingエラー通知"
+                body = f"&lt;p&gt;{host}へのpingは通りませんでした。&lt;/p&gt;"
+                msg = MIMEMultipart()
+                msg["Subject"] = subject
+                msg["To"] = send_to
+                msg["From"] = g_mail_address
+                msg.attach(MIMEText(body, "html"))
+                s = smtplib.SMTP(stmp_server, stmp_port)
+                s.starttls()
+                s.login(g_mail_address, g_mail_password)
+                s.sendmail(g_mail_address, send_to, msg.as_string())
+                s.quit()
+                print("reported")
+
+    if __name__ == '__main__':
+        data_file = pd.read_csv("config.csv")
+        arg_df = data_file[["key", "value"]].values
+        test_flag, target_host = (arg_df[3][1], arg_df[4][1])
+        ping_windows(target_host, test_flag)</pre>
+    <p>pingが通らなかった場合のみ送信する仕様。</p>
+    <p>テストモードで起動すると、pysimpleguiのダイアログでのみ通知。</p>
+    <img src="static/images/dialog.png" alt="dialog" width=200px>
+    <p>これも地味に使い勝手が良い。</p>
+    <br><br>
+    <h3 id="pyinstaller">パッケージ化してタスクスケジューラで自動起動</h3>
+    <p>pyinstallerをインストールして、サクッとexe化。</p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+ $ pyinstaller　○○.py　--onefile</pre>
+    <p>これで上のプログラムはすべて問題なくexe化できた。
+    <br>目的の.pyファイルのあるディレクトリに移動してから実行しないとエラーになる。</p>
+    <p>タスクスケジューラで起動するときの躓きポイントとして、直接exeファイルを実行させると相対パスでは関連ファイルを読み込んでもらえない。</p>
+    <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
+　@echo off
+　ping_robo.exe</pre>
+    <p>同一ディレクトリにこんな感じのbatファイルを作成してこちらを起動してやるといい感じに動いてくれた。</p>
+
+
+
+
+</div>
+
+
+</body>
+<footer>
+    <div class="wrapper">
+        <p><small>&copy; 2021 furukawa3152</small></p>
+    </div>
+
+</footer>
+</html>

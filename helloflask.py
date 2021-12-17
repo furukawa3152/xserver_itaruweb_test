@@ -24,44 +24,49 @@ def hello_world():
     return render_template("index.html")
 
 
-@app.route('/code.html')
+@app.route('/code')
 def code():
     return render_template("code.html")
 
 
-@app.route('/contact.html')
+@app.route('/contact')
 def contact():
     return render_template("contact.html")
 
 
-@app.route('/library.html')
+@app.route('/library')
 def phtotos():
     return render_template("library.html")
 
 
-@app.route('/line_bot.html')
+@app.route('/line_bot')
 def line_bot():
     return render_template("line_bot.html")
 
 
-@app.route('/potate_boy.html')
+@app.route('/potate_boy')
 def potate_boy():
     return render_template("potate_boy.html")
 
 
-@app.route('/profile.html')
+@app.route('/profile')
 def profile():
     return render_template("profile.html")
 
 
-@app.route('/index.html')
+@app.route('/top')
 def hello():
     return render_template("index.html")
 
 
-@app.route('/python_tips.html')
+@app.route('/python_tips')
 def tips():
     return render_template("python_tips.html")
+
+@app.route('/python_RPA')
+def RPA():
+    return render_template("python_RPA.html")
+
 
 
 @app.route('/thanx.html', methods=["GET", "POST"])
@@ -91,7 +96,7 @@ def thanx():
 
         return render_template("thanx.html", name=name)
     else:
-        return render_template("index.html")
+        return render_template("top")
 
 @app.route('/send_mail.html', methods=["GET", "POST"])
 def send_mail():
@@ -109,7 +114,7 @@ def send_mail():
 
         return render_template("send_mail.html", mail=session["mail_properties"])
     else:
-        return render_template("index.html")
+        return render_template("top")
 
 
 @app.route("/chatbot")
@@ -192,7 +197,7 @@ def fetch_sql(sql_sentence):
         host='localhost',
         user=sqluser,
         password=sqlpassword,
-        database='xs146180_python1',
+        database='itaru_test',
         charset="utf8")
     cursor = connector.cursor()
     sql = sql_sentence
