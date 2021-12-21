@@ -50,8 +50,8 @@
 
 <div class="code-body">
     <header class="post-info">
-        <h2 class="post-title">pythonでRPA作ってみた</h2>
-        <img class="post-icon" src="static/images/code_icon.png" alt="code-icon" width=55rem>
+        <h2 class="post-title">pythonでRPAを作ってみた</h2>
+        <img class="post-icon" src="static/images/python_robo.png" alt="code-icon" width=65rem>
         <p class="post-cat">category：<a href="code">code</a>：python_RPA</p>
     </header>
     <h1 class="pRPA_tytle">pythonロボで自動メール送信するよ！！！</h1>
@@ -64,7 +64,7 @@
     </p>
         <br>
     <h3>プログラム概要</h3>
-    <h4>主な使用ライブラリ：smtplib,pyautogui他<br>
+    <h4>主な使用ライブラリ：smtplib,pyautogui,pyinstaller他<br>
         やりたかったこと：特定の条件を満たすと自動的にメールを送る仕組みを実装したい。
     </h4>
     <p>
@@ -79,6 +79,7 @@
             <li><a href="#logarart">活用2：毎日特定の時刻に起動してエラーログがあればメール送信</a></li>
             <li><a href="#ping">活用3：pingを飛ばして死活確認。落ちている端末をメール通知</a></li>
             <li><a href="#pyinstaller">パッケージ化してタスクスケジューラで自動起動</a></li>
+            <li><a href="#matome">まとめと宣伝</a></li>
         </ul>
     </nav>
     <h3 id="gmail">まずはgmail送信を実装</h3>
@@ -381,19 +382,34 @@
     <p>これも地味に使い勝手が良い。</p>
     <br><br>
     <h3 id="pyinstaller">パッケージ化してタスクスケジューラで自動起動</h3>
-    <p>pyinstallerをインストールして、サクッとexe化。</p>
+    <p>pyinstallerというライブラリを利用することで、exe化してpythonの入っていない端末でも利用が可能。</p>
+    <p>特に今回は複数の端末に組み込みたかったし、出来が良ければ配布したいという思いもありパッケージ化してみました。</p>
     <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
  $ pyinstaller　○○.py　--onefile</pre>
     <p>これで上のプログラムはすべて問題なくexe化できた。
     <br>目的の.pyファイルのあるディレクトリに移動してから実行しないとエラーになる。</p>
-    <p>タスクスケジューラで起動するときの躓きポイントとして、直接exeファイルを実行させると相対パスでは関連ファイルを読み込んでもらえない。</p>
+    <p>タスクスケジューラで起動するときひとつ躓きポイントが、、、</p>
+    <p>タスクスケジューラに直接exeファイルを指定してやると関連ファイル(config.csv等)を読み込んでもらえなくてエラーとなるのである。
+    ダブルクリックで実行すると上手くいくのに何故！？とだいぶハマった。</p>
+    <p>調べたところ、タスクスケジューラでのプログラム起動では相対パス指定を受け付けてもらえないようで、、</p>
+
     <pre class="code-line prettyprint linenums gmail_code" style="overflow:auto; overflow-y:hidden;">
 　@echo off
 　ping_robo.exe</pre>
-    <p>同一ディレクトリにこんな感じのbatファイルを作成してこちらを起動してやるといい感じに動いてくれた。</p>
-
-
-
+    <p>同一ディレクトリにこんな感じのbatファイルを作成してこちらを起動してやるとちゃんと直下のファイルを読み込んでもらえた。</p>
+    <p>タスクスケジューラへの登録はこんな感じ。</p>
+    <img src="static/images/tasks.png" alt="tasks" width=300px>
+    <p>開始オプションにディレクトリ名を指定してやらないと動かなかった。（環境による模様）</p>
+    <br>
+    <h3 id="matome">まとめ</h3>
+    <p>pythonでRPA的なものを作る場合はまずpyautoguiが思いつくが、他のライブラリを有効に組み合わせることで
+    ロボの堅牢性を上げる事が出来ると感じた。無償でこれだけ色々実装できるのはやはり魅力的。
+    <br>特に常時起動して見張らせるという仕組みは色々応用して見たいと思います。</p>
+    <br>
+    <p>最後に、友人たちと佐賀で業務自動化するコミュニティを広げていきたいと画策しております。
+    <br>→（<a href="https://ocomoji.co.jp/">株式会社ocomoji｜DXをもっと身近に</a>）</p>
+    <p>RPAコミュニティには加入させていただいたばかりですが、色々な形で地元のDXを盛り上げていきたいと思っていますので
+    これからもよろしくお願いいたします。長文お付き合いありがとうございました。</p>
 
 </div>
 

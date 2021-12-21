@@ -551,7 +551,7 @@ margin-top: 3px;
 .mail_kakunin{
     margin-left: 8rem;
 }
-
+/*RPA*/
 .pRPA_tytle{
     font-size: 22px;
 }
@@ -589,4 +589,86 @@ margin-top: 3px;
 }
 .rpaimg{
     border: 1px solid #c0c0c0;
+}
+
+/*omikuji*/
+.omikuji-title{
+    font-size: 40px;
+}
+@media (max-width:500px){
+    .omikuji-title{
+        font-size: 24px;
+    }
+}
+
+
+.omikuji_img{
+    padding-left: 15px;
+}
+
+.omikuji_btn{
+  position: relative;
+  z-index: 2;
+  background-color: #fff;
+  border: 1px solid #c0c0c0;
+  border-radius: 10px;
+  color: #333;
+  line-height: 50px;
+  overflow: hidden;
+  padding: 3px 10px 3px 10px;
+  margin-left: 40px;
+  margin-bottom: 10px;
+  transition: all .3s;
+}
+.omikuji_btn:hover {
+  background-color: black;
+  color: #fff;
+}
+
+.omikuji_text{
+    color:#383736;
+    margin-left: 40px;
+    margin-bottom: 10px;
+}
+.omikuji_result_text{
+    font-size: 20px;
+    color:#383736;
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-bottom: 10px;
+}
+.kotoyoro{
+    font-size: 15px;
+    color:#383736;
+    margin-left: 25px;
+    margin-right: 25px;
+    }
+.kekka_img{
+    width: 170px;
+    margin-left: 30px;
+    transition: 3s;
+}
+.img-wrap {
+
+  overflow: hidden;
+  position: relative;
+}
+
+.img-wrap:before {
+  animation: img-wrap 2s cubic-bezier(.4, 0, .2, 1) forwards;
+  background: #fff;
+  bottom: 0;
+  content: '';
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+
+@keyframes img-wrap {
+  100% {
+    transform: translateY(100%);
+  }
 }

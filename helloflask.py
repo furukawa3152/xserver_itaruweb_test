@@ -208,5 +208,27 @@ def fetch_sql(sql_sentence):
     connector.close()
     return result
 
+@app.route("/omikuji", methods=["GET", "POST"])
+def omikuji():
+    if request.method == "POST":
+        kekka_list = ["大吉","中吉","吉","小吉","末吉","凶"]
+        img_list = ["daikichi","chuukichi","kichi","syoukichi","suekichi","kyou"]
+        naiyou_list = ["最高の一年になりそうです。Itaruにお年玉をあげると益々運気がアップ！",
+                       "運気は上々。Itaruを思いやることでさらなる上昇が望めます。",
+                       "まずまずの年になりそうです。Itaruに甘いものをあげるといいことがありそう。",
+                       "今まで準備してきたことが開花しそうな年。Itaruが応援しています。",
+                       "健康には注意したい年。Itaruを飲みに誘うと運気が上がりそうです。",
+                       "運気は低迷の兆候ですが、Itaruにお年玉を上げると一気に好転しそうです。"]
+        num = random.randint(0,5)
+        kekka = kekka_list[num]
+        naiyou = naiyou_list[num]
+        kekka_img = img_list[num]
+        return render_template("omikuji_result.html" , kekka = kekka, naiyou = naiyou, kekka_img = kekka_img)
+    if request.method == "GET":
+        return render_template("omikuji.html")
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
